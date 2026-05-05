@@ -1,4 +1,4 @@
-package com.nnson128.myapplication
+package com.ndphong.myapplication
 
 import android.view.LayoutInflater
 import android.view.View
@@ -14,32 +14,27 @@ class WeatherAdapter(
 ) : RecyclerView.Adapter<WeatherAdapter.WeatherViewHolder>() {
 
     inner class WeatherViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val weatherIcon: ImageView = itemView.findViewById(R.id.weather_icon)
-        private val weatherCode: TextView = itemView.findViewById(R.id.weather_code)
-        private val weatherDescription: TextView = itemView.findViewById(R.id.weather_description)
-        private val weatherType: TextView = itemView.findViewById(R.id.weather_type)
-        private val deleteBtn: TextView = itemView.findViewById(R.id.delete_btn)
+        private val txtAreaCode: TextView = itemView.findViewById(R.id.txt_area_code)
+        private val txtTemperature: TextView = itemView.findViewById(R.id.txt_temperature)
+        private val txtHumidity: TextView = itemView.findViewById(R.id.txt_humidity)
+        private val txtIntensity: TextView = itemView.findViewById(R.id.txt_intensity)
+        private val imgWeatherIcon: ImageView = itemView.findViewById(R.id.img_weather_icon)
 
         fun bind(weather: Weather) {
-            weatherCode.text = "Mã khí hậu: ${weather.id}"
-            weatherDescription.text = "Mô tả: ${weather.description}"
-            weatherType.text = "Loại: ${weather.weatherType}"
+            txtAreaCode.text = "Mã khu vực: ${weather.areaCode}"
+            txtTemperature.text = "Nhiệt độ: ${weather.temperature}"
+            txtHumidity.text = "Độ ẩm: ${weather.humidity}"
+            txtIntensity.text = "Kiểu thời tiết: ${weather.weatherType}"
 
-            // Set icon based on weather type
-            val iconResId = when (weather.weatherType) {
-                "Nắng nhẹ" -> R.drawable.w1
-                "Nhiều mây" -> R.drawable.w2
-                "Mưa" -> R.drawable.w3
-                else -> R.drawable.w1
+            when (weather.weatherType) {
+                "Nắng nhẹ" -> imgWeatherIcon.setImageResource(R.drawable.w1)
+                "Nhiều mây" -> imgWeatherIcon.setImageResource(R.drawable.w3)
+                "Mưa" -> imgWeatherIcon.setImageResource(R.drawable.w2)
+                else -> imgWeatherIcon.setImageResource(R.drawable.w1)
             }
-            weatherIcon.setImageResource(iconResId)
 
             itemView.setOnClickListener {
                 onItemClick(weather)
-            }
-
-            deleteBtn.setOnClickListener {
-                onDeleteClick(weather)
             }
         }
     }

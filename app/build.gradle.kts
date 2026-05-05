@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.nnson128.myapplication"
+    namespace = "com.ndphong.myapplication"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.nnson128.myapplication"
+        applicationId = "com.ndphong.myapplication"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -41,6 +41,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.recyclerview)
+    implementation(libs.gson)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
