@@ -6,6 +6,7 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -141,11 +142,18 @@ class MainActivity : AppCompatActivity() {
 
         val index = items.indexOfFirst { it.id == selectedItem?.id }
         if (index != -1) {
-            items[index] = PhoneMarketItem(selectedItem!!.id, year, production, marketShare, company)
-            phoneMarketAdapter.updateList(items)
-            clearFields()
-            selectedItem = null
-            Toast.makeText(this, "Cập nhật thành công", Toast.LENGTH_SHORT).show()
+            AlertDialog.Builder(this)
+                .setTitle("Xác nhận sửa")
+                .setMessage("Bạn có chắc muốn cập nhật mục này?")
+                .setPositiveButton("Sửa") { _, _ ->
+                    items[index] = PhoneMarketItem(selectedItem!!.id, year, production, marketShare, company)
+                    phoneMarketAdapter.updateList(items)
+                    clearFields()
+                    selectedItem = null
+                    Toast.makeText(this, "Cập nhật thành công", Toast.LENGTH_SHORT).show()
+                }
+                .setNegativeButton("Hủy", null)
+                .show()
         }
     }
 
