@@ -1,4 +1,4 @@
-package com.ndphong.myapplication
+package com.example.myapplication
 
 import android.view.LayoutInflater
 import android.view.View

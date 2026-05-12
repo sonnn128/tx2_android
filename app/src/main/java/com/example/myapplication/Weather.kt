@@ -1,4 +1,4 @@
-package com.ndphong.myapplication
+package com.example.myapplication
 
 data class Weather(
     val id: Int,
