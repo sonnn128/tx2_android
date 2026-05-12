@@ -16,17 +16,17 @@ import com.google.gson.reflect.TypeToken
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var edtAreaCode: EditText
-    private lateinit var edtTemperature: EditText
-    private lateinit var edtHumidity: EditText
-    private lateinit var spinnerWeatherType: Spinner
+    private lateinit var edtYear: EditText
+    private lateinit var edtProduction: EditText
+    private lateinit var edtMarketShare: EditText
+    private lateinit var spinnerCompany: Spinner
     private lateinit var btnAdd: android.widget.TextView
     private lateinit var btnEdit: android.widget.TextView
     private lateinit var btnSave: android.widget.TextView
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: PhoneMarketAdapter
-    private var weatherList = mutableListOf<PhoneMarketItem>()
-    private var selectedWeather: PhoneMarketItem? = null
+    private lateinit var phoneMarketRecyclerView: RecyclerView
+    private lateinit var phoneMarketAdapter: PhoneMarketAdapter
+    private var items = mutableListOf<PhoneMarketItem>()
+    private var selectedItem: PhoneMarketItem? = null
     private var nextId = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,53 +40,53 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Initialize views
-        edtAreaCode = findViewById(R.id.edt_area_code)
-        edtTemperature = findViewById(R.id.edt_temperature)
-        edtHumidity = findViewById(R.id.edt_humidity)
-        spinnerWeatherType = findViewById(R.id.spinner_weather_type)
+        edtYear = findViewById(R.id.edt_year)
+        edtProduction = findViewById(R.id.edt_production)
+        edtMarketShare = findViewById(R.id.edt_market_share)
+        spinnerCompany = findViewById(R.id.spinner_company)
         btnAdd = findViewById(R.id.btn_add)
         btnEdit = findViewById(R.id.btn_edit)
         btnSave = findViewById(R.id.btn_save)
-        recyclerView = findViewById(R.id.weather_recycler_view)
+        phoneMarketRecyclerView = findViewById(R.id.phone_market_recycler_view)
 
-        // Setup Spinner
-        setupSpinner()
-2
+        // Setup spinner
+        setupCompanySpinner()
+
         // Setup RecyclerView
-        setupRecyclerView()
+        setupPhoneMarketRecyclerView()
 
-        // Load data from cache
-        loadWeatherData()
+        // Load data
+        loadPhoneMarketData()
 
         // Setup button listeners
-        btnAdd.setOnClickListener { addWeather() }
-        btnEdit.setOnClickListener { editWeather() }
-        btnSave.setOnClickListener { saveWeatherData() }
+        btnAdd.setOnClickListener { addItem() }
+        btnEdit.setOnClickListener { editItem() }
+        btnSave.setOnClickListener { savePhoneMarketData() }
     }
 
-    private fun setupSpinner() {
-        val weatherTypes = arrayOf("-- Chọn công ty --", "Apple", "Samsung", "Xiaomi")
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, weatherTypes)
+    private fun setupCompanySpinner() {
+        val companies = arrayOf("-- Chọn công ty --", "Apple", "Samsung", "Xiaomi")
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, companies)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinnerWeatherType.adapter = adapter
+        spinnerCompany.adapter = adapter
     }
 
-    private fun setupRecyclerView() {
-        adapter = PhoneMarketAdapter(weatherList, { weather ->
-            selectedWeather = weather
-            edtAreaCode.setText(weather.areaCode)
-            edtHumidity.setText(weather.humidity)
-            edtTemperature.setText(weather.temperature)
-            spinnerWeatherType.setSelection(getWeatherTypePosition(weather.weatherType))
-        }, { weather ->
-            deleteWeatherItem(weather)
+    private fun setupPhoneMarketRecyclerView() {
+        phoneMarketAdapter = PhoneMarketAdapter(items, { item ->
+            selectedItem = item
+            edtYear.setText(item.year)
+            edtMarketShare.setText(item.marketShare)
+            edtProduction.setText(item.production)
+            spinnerCompany.setSelection(getCompanyPosition(item.company))
+        }, { item ->
+            deleteItem(item)
         })
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = adapter
+        phoneMarketRecyclerView.layoutManager = LinearLayoutManager(this)
+        phoneMarketRecyclerView.adapter = phoneMarketAdapter
     }
 
-    private fun getWeatherTypePosition(weatherType: String): Int {
-        return when (weatherType) {
+    private fun getCompanyPosition(company: String): Int {
+        return when (company) {
             "Apple" -> 1
             "Samsung" -> 2
             "Xiaomi" -> 3
@@ -94,87 +94,87 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun addWeather() {
-        val areaCode = edtAreaCode.text.toString().trim()
-        val temperature = edtTemperature.text.toString().trim()
-        val humidity = edtHumidity.text.toString().trim()
-        val weatherType = spinnerWeatherType.selectedItem.toString()
+    private fun addItem() {
+        val year = edtYear.text.toString().trim()
+        val production = edtProduction.text.toString().trim()
+        val marketShare = edtMarketShare.text.toString().trim()
+        val company = spinnerCompany.selectedItem.toString()
 
-        if (weatherType == "-- Chọn công ty --") {
+        if (company == "-- Chọn công ty --") {
             Toast.makeText(this, "Vui lòng Chọn công ty", Toast.LENGTH_SHORT).show()
             return
         }
 
-        if (areaCode.isEmpty() || temperature.isEmpty() || humidity.isEmpty()) {
+        if (year.isEmpty() || production.isEmpty() || marketShare.isEmpty()) {
             Toast.makeText(this, "Vui lòng điền đầy đủ thông tin", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val weather = PhoneMarketItem(nextId++, areaCode, temperature, humidity, weatherType)
-        weatherList.add(weather)
-        adapter.updateList(weatherList)
+        val item = PhoneMarketItem(nextId++, year, production, marketShare, company)
+        items.add(item)
+        phoneMarketAdapter.updateList(items)
         clearFields()
-        selectedWeather = null
+        selectedItem = null
         Toast.makeText(this, "Thêm thành công", Toast.LENGTH_SHORT).show()
     }
 
-    private fun editWeather() {
-        if (selectedWeather == null) {
+    private fun editItem() {
+        if (selectedItem == null) {
             Toast.makeText(this, "Vui lòng chọn một mục để sửa", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val areaCode = edtAreaCode.text.toString().trim()
-        val temperature = edtTemperature.text.toString().trim()
-        val humidity = edtHumidity.text.toString().trim()
-        val weatherType = spinnerWeatherType.selectedItem.toString()
+        val year = edtYear.text.toString().trim()
+        val production = edtProduction.text.toString().trim()
+        val marketShare = edtMarketShare.text.toString().trim()
+        val company = spinnerCompany.selectedItem.toString()
 
-        if (weatherType == "-- Chọn công ty --") {
+        if (company == "-- Chọn công ty --") {
             Toast.makeText(this, "Vui lòng Chọn công ty", Toast.LENGTH_SHORT).show()
             return
         }
 
-        if (areaCode.isEmpty() || temperature.isEmpty() || humidity.isEmpty()) {
+        if (year.isEmpty() || production.isEmpty() || marketShare.isEmpty()) {
             Toast.makeText(this, "Vui lòng điền đầy đủ thông tin", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val index = weatherList.indexOfFirst { it.id == selectedWeather?.id }
+        val index = items.indexOfFirst { it.id == selectedItem?.id }
         if (index != -1) {
-            weatherList[index] = PhoneMarketItem(selectedWeather!!.id, areaCode, temperature, humidity, weatherType)
-            adapter.updateList(weatherList)
+            items[index] = PhoneMarketItem(selectedItem!!.id, year, production, marketShare, company)
+            phoneMarketAdapter.updateList(items)
             clearFields()
-            selectedWeather = null
+            selectedItem = null
             Toast.makeText(this, "Cập nhật thành công", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun deleteWeatherItem(weather: PhoneMarketItem) {
-        weatherList.removeAll { it.id == weather.id }
-        adapter.updateList(weatherList)
+    private fun deleteItem(item: PhoneMarketItem) {
+        items.removeAll { it.id == item.id }
+        phoneMarketAdapter.updateList(items)
         clearFields()
-        if (selectedWeather?.id == weather.id) {
-            selectedWeather = null
+        if (selectedItem?.id == item.id) {
+            selectedItem = null
         }
         Toast.makeText(this, "Xoá thành công", Toast.LENGTH_SHORT).show()
     }
 
     private fun clearFields() {
-        edtAreaCode.text.clear()
-        edtTemperature.text.clear()
-        edtHumidity.text.clear()
-        spinnerWeatherType.setSelection(0)
+        edtYear.text.clear()
+        edtProduction.text.clear()
+        edtMarketShare.text.clear()
+        spinnerCompany.setSelection(0)
     }
 
-    private fun saveWeatherData() {
+    private fun savePhoneMarketData() {
         val gson = Gson()
-        val json = gson.toJson(weatherList)
+        val json = gson.toJson(items)
         val file = File(filesDir, "Phone")
         file.writeText(json)
         Toast.makeText(this, "Dữ liệu đã được lưu", Toast.LENGTH_SHORT).show()
     }
 
-    private fun loadWeatherData() {
+    private fun loadPhoneMarketData() {
         val file = File(filesDir, "Phone")
         if (!file.exists()) {
             return
@@ -183,8 +183,8 @@ class MainActivity : AppCompatActivity() {
         val gson = Gson()
         val type = object : TypeToken<List<PhoneMarketItem>>() {}.type
         val loadedList: List<PhoneMarketItem> = gson.fromJson(json, type)
-        weatherList = loadedList.toMutableList()
-        adapter.updateList(weatherList)
-        nextId = (weatherList.maxOfOrNull { it.id } ?: 0) + 1
+        items = loadedList.toMutableList()
+        phoneMarketAdapter.updateList(items)
+        nextId = (items.maxOfOrNull { it.id } ?: 0) + 1
     }
 }

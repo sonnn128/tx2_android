@@ -69,14 +69,14 @@
 
         <!-- Company Spinner -->
     <Spinner
-        android:id="@+id/spinner_weather_type"
+        android:id="@+id/spinner_company"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginBottom="8dp" />
 
         <!-- Input Fields -->
     <EditText
-        android:id="@+id/edt_area_code"
+        android:id="@+id/edt_year"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:hint="Năm"
@@ -84,7 +84,7 @@
         android:padding="8dp" />
 
     <EditText
-        android:id="@+id/edt_temperature"
+        android:id="@+id/edt_production"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:hint="Xuất xưởng"
@@ -92,16 +92,16 @@
         android:padding="8dp" />
 
     <EditText
-        android:id="@+id/edt_humidity"
+        android:id="@+id/edt_market_share"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:hint="Thị phần "
         android:layout_marginBottom="4dp"
         android:padding="8dp" />
 
-    <!-- Weather List -->
+    <!-- Phone Market List -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/weather_recycler_view"
+        android:id="@+id/phone_market_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

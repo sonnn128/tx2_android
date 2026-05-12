@@ -8,50 +8,50 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class PhoneMarketAdapter(
-    private var weatherList: MutableList<PhoneMarketItem>,
+    private var items: MutableList<PhoneMarketItem>,
     private val onItemClick: (PhoneMarketItem) -> Unit,
     private val onDeleteClick: (PhoneMarketItem) -> Unit
 ) : RecyclerView.Adapter<PhoneMarketAdapter.PhoneMarketViewHolder>() {
 
     inner class PhoneMarketViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val txtAreaCode: TextView = itemView.findViewById(R.id.txt_area_code)
-        private val txtTemperature: TextView = itemView.findViewById(R.id.txt_temperature)
-        private val txtHumidity: TextView = itemView.findViewById(R.id.txt_humidity)
-        private val txtIntensity: TextView = itemView.findViewById(R.id.txt_intensity)
-        private val imgWeatherIcon: ImageView = itemView.findViewById(R.id.img_weather_icon)
+        private val txtCompany: TextView = itemView.findViewById(R.id.txt_company)
+        private val txtYear: TextView = itemView.findViewById(R.id.txt_year)
+        private val txtProduction: TextView = itemView.findViewById(R.id.txt_production)
+        private val txtMarketShare: TextView = itemView.findViewById(R.id.txt_market_share)
+        private val imgCompanyIcon: ImageView = itemView.findViewById(R.id.img_company_icon)
 
-        fun bind(weather: PhoneMarketItem) {
-            txtAreaCode.text = "Công ty: ${weather.weatherType}"
-            txtTemperature.text = "Năm: ${weather.areaCode}"
-            txtHumidity.text = "Sản xuất: ${weather.temperature}"
-            txtIntensity.text = "Thị phần: ${weather.humidity}"
+        fun bind(item: PhoneMarketItem) {
+            txtCompany.text = "Công ty: ${item.company}"
+            txtYear.text = "Năm: ${item.year}"
+            txtProduction.text = "Sản xuất: ${item.production}"
+            txtMarketShare.text = "Thị phần: ${item.marketShare}"
 
-            when (weather.weatherType) {
-                "Apple" -> imgWeatherIcon.setImageResource(R.drawable.w1)
-                "Samsung" -> imgWeatherIcon.setImageResource(R.drawable.w3)
-                "Xiaomi" -> imgWeatherIcon.setImageResource(R.drawable.w2)
-                else -> imgWeatherIcon.setImageResource(R.drawable.w1)
+            when (item.company) {
+                "Apple" -> imgCompanyIcon.setImageResource(R.drawable.w1)
+                "Samsung" -> imgCompanyIcon.setImageResource(R.drawable.w3)
+                "Xiaomi" -> imgCompanyIcon.setImageResource(R.drawable.w2)
+                else -> imgCompanyIcon.setImageResource(R.drawable.w1)
             }
 
             itemView.setOnClickListener {
-                onItemClick(weather)
+                onItemClick(item)
             }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhoneMarketViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.weather_item, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.phone_market_item, parent, false)
         return PhoneMarketViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: PhoneMarketViewHolder, position: Int) {
-        holder.bind(weatherList[position])
+        holder.bind(items[position])
     }
 
-    override fun getItemCount(): Int = weatherList.size
+    override fun getItemCount(): Int = items.size
 
     fun updateList(newList: List<PhoneMarketItem>) {
-        weatherList = newList.toMutableList()
+        items = newList.toMutableList()
         notifyDataSetChanged()
     }
 }
