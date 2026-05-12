@@ -18,7 +18,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Thời tiết trong ngày"
+            android:text="Dự báo thời tiết"
             android:textColor="#FFFFFF"
             android:textSize="18sp" />
 
@@ -39,7 +39,7 @@
             android:id="@+id/btn_edit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="SỬA"
+            android:text="XÓA"
             android:textColor="#000000"
             android:textSize="14sp"
             android:textStyle="bold"
@@ -80,7 +80,7 @@
         android:id="@+id/edt_temperature"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:hint="Nhiệt độ"
+        android:hint="Nhiệt độ cao nhất"
         android:layout_marginBottom="4dp"
         android:padding="8dp" />
 
@@ -88,7 +88,7 @@
         android:id="@+id/edt_humidity"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:hint="Độ ẩm"
+        android:hint="Nhiệt độ thấp nhất"
         android:layout_marginBottom="4dp"
         android:padding="8dp" />
 

@@ -5,5 +5,5 @@ data class Weather(
     val areaCode: String,
     val temperature: String,
     val humidity: String,
-    val weatherType: String  // "Nắng nhẹ", "Nhiều mây", "Mưa"
+    val weatherType: String  // "Nắng", "Mây", "Mưa"
 )

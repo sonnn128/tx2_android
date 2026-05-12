@@ -22,13 +22,13 @@ class WeatherAdapter(
 
         fun bind(weather: Weather) {
             txtAreaCode.text = "Mã khu vực: ${weather.areaCode}"
-            txtTemperature.text = "Nhiệt độ: ${weather.temperature}"
-            txtHumidity.text = "Độ ẩm: ${weather.humidity}"
+            txtTemperature.text = "Nhiệt độ cao nhất: ${weather.temperature}"
+            txtHumidity.text = "Nhiệt độ thấp nhất: ${weather.humidity}"
             txtIntensity.text = "Kiểu thời tiết: ${weather.weatherType}"
 
             when (weather.weatherType) {
-                "Nắng nhẹ" -> imgWeatherIcon.setImageResource(R.drawable.w1)
-                "Nhiều mây" -> imgWeatherIcon.setImageResource(R.drawable.w3)
+                "Nắng" -> imgWeatherIcon.setImageResource(R.drawable.w1)
+                "Mây" -> imgWeatherIcon.setImageResource(R.drawable.w3)
                 "Mưa" -> imgWeatherIcon.setImageResource(R.drawable.w2)
                 else -> imgWeatherIcon.setImageResource(R.drawable.w1)
             }

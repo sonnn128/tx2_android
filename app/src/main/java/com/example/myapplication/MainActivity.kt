@@ -8,6 +8,7 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -15,7 +16,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import java.io.File
 
 class MainActivity : AppCompatActivity() {
     private lateinit var edtAreaCode: EditText
@@ -66,12 +66,12 @@ class MainActivity : AppCompatActivity() {
 
         // Setup button listeners
         btnAdd.setOnClickListener { addWeather() }
-        btnEdit.setOnClickListener { editWeather() }
+        btnEdit.setOnClickListener { deleteSelectedWeather() }
         btnSave.setOnClickListener { saveWeatherData() }
     }
 
     private fun setupSpinner() {
-        val weatherTypes = arrayOf("-- Chọn kiểu thời tiết --", "Nắng nhẹ", "Nhiều mây", "Mưa")
+        val weatherTypes = arrayOf("-- Chọn kiểu thời tiết --", "Nắng", "Mây", "Mưa")
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, weatherTypes)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerWeatherType.adapter = adapter
@@ -93,8 +93,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun getWeatherTypePosition(weatherType: String): Int {
         return when (weatherType) {
-            "Nắng nhẹ" -> 1
-            "Nhiều mây" -> 2
+            "Nắng" -> 1
+            "Mây" -> 2
             "Mưa" -> 3
             else -> 0
         }
@@ -124,35 +124,25 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, "Thêm thành công", Toast.LENGTH_SHORT).show()
     }
 
-    private fun editWeather() {
-        if (selectedWeather == null) {
-            Toast.makeText(this, "Vui lòng chọn một mục để sửa", Toast.LENGTH_SHORT).show()
+    private fun deleteSelectedWeather() {
+        val selected = selectedWeather
+        if (selected == null) {
+            Toast.makeText(this, "Vui lòng chọn một mục để xóa", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val areaCode = edtAreaCode.text.toString().trim()
-        val temperature = edtTemperature.text.toString().trim()
-        val humidity = edtHumidity.text.toString().trim()
-        val weatherType = spinnerWeatherType.selectedItem.toString()
-
-        if (weatherType == "-- Chọn kiểu thời tiết --") {
-            Toast.makeText(this, "Vui lòng chọn kiểu thời tiết", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        if (areaCode.isEmpty() || temperature.isEmpty() || humidity.isEmpty()) {
-            Toast.makeText(this, "Vui lòng điền đầy đủ thông tin", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val index = weatherList.indexOfFirst { it.id == selectedWeather?.id }
-        if (index != -1) {
-            weatherList[index] = Weather(selectedWeather!!.id, areaCode, temperature, humidity, weatherType)
-            adapter.updateList(weatherList)
-            clearFields()
-            selectedWeather = null
-            Toast.makeText(this, "Cập nhật thành công", Toast.LENGTH_SHORT).show()
-        }
+        AlertDialog.Builder(this)
+            .setTitle("Xác nhận xóa")
+            .setMessage("Bạn có chắc muốn xóa mục này?")
+            .setPositiveButton("Xóa") { _, _ ->
+                weatherList.removeAll { it.id == selected.id }
+                adapter.updateList(weatherList)
+                clearFields()
+                selectedWeather = null
+                Toast.makeText(this, "Xóa thành công", Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton("Hủy", null)
+            .show()
     }
 
     private fun deleteWeatherItem(weather: Weather) {
@@ -172,29 +162,22 @@ class MainActivity : AppCompatActivity() {
         spinnerWeatherType.setSelection(0)
     }
 
-    override fun onPause() {
-        super.onPause()
-        saveWeatherData()
-    }
-
     private fun saveWeatherData() {
         val gson = Gson()
         val json = gson.toJson(weatherList)
-        val file = File(cacheDir, "weather_cache.json")
-        file.writeText(json)
-        Toast.makeText(this, "Dữ liệu đã được lưu vào bộ nhớ tạm (Cache)", Toast.LENGTH_SHORT).show()
+        sharedPreferences.edit()
+            .putString("weather_data", json)
+            .apply()
+        Toast.makeText(this, "Dữ liệu đã được lưu", Toast.LENGTH_SHORT).show()
     }
 
     private fun loadWeatherData() {
-        val file = File(cacheDir, "weather_cache.json")
-        if (file.exists()) {
-            val json = file.readText()
-            val gson = Gson()
-            val type = object : TypeToken<List<Weather>>() {}.type
-            val loadedList: List<Weather> = gson.fromJson(json, type)
-            weatherList = loadedList.toMutableList()
-            adapter.updateList(weatherList)
-            nextId = (weatherList.maxOfOrNull { it.id } ?: 0) + 1
-        }
+        val json = sharedPreferences.getString("weather_data", null) ?: return
+        val gson = Gson()
+        val type = object : TypeToken<List<Weather>>() {}.type
+        val loadedList: List<Weather> = gson.fromJson(json, type)
+        weatherList = loadedList.toMutableList()
+        adapter.updateList(weatherList)
+        nextId = (weatherList.maxOfOrNull { it.id } ?: 0) + 1
     }
 }
