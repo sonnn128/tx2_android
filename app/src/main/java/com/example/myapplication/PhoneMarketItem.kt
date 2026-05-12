@@ -1,9 +1,9 @@
 package com.example.myapplication
 
-data class Weather(
+data class PhoneMarketItem(
     val id: Int,
     val areaCode: String,
     val temperature: String,
     val humidity: String,
-    val weatherType: String  // "Nắng", "Mây", "Mưa"
+    val weatherType: String  // "Apple", "Samsung", "Xiaomi"
 )

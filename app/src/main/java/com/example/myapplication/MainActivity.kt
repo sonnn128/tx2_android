@@ -1,14 +1,11 @@
 package com.example.myapplication
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -16,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
     private lateinit var edtAreaCode: EditText
@@ -26,10 +24,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnEdit: android.widget.TextView
     private lateinit var btnSave: android.widget.TextView
     private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: WeatherAdapter
-    private lateinit var sharedPreferences: SharedPreferences
-    private var weatherList = mutableListOf<Weather>()
-    private var selectedWeather: Weather? = null
+    private lateinit var adapter: PhoneMarketAdapter
+    private var weatherList = mutableListOf<PhoneMarketItem>()
+    private var selectedWeather: PhoneMarketItem? = null
     private var nextId = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,9 +38,6 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
-        // Initialize SharedPreferences
-        sharedPreferences = getSharedPreferences("WeatherApp", Context.MODE_PRIVATE)
 
         // Initialize views
         edtAreaCode = findViewById(R.id.edt_area_code)
@@ -57,7 +51,7 @@ class MainActivity : AppCompatActivity() {
 
         // Setup Spinner
         setupSpinner()
-
+2
         // Setup RecyclerView
         setupRecyclerView()
 
@@ -66,19 +60,19 @@ class MainActivity : AppCompatActivity() {
 
         // Setup button listeners
         btnAdd.setOnClickListener { addWeather() }
-        btnEdit.setOnClickListener { deleteSelectedWeather() }
+        btnEdit.setOnClickListener { editWeather() }
         btnSave.setOnClickListener { saveWeatherData() }
     }
 
     private fun setupSpinner() {
-        val weatherTypes = arrayOf("-- Chọn kiểu thời tiết --", "Nắng", "Mây", "Mưa")
+        val weatherTypes = arrayOf("-- Chọn công ty --", "Apple", "Samsung", "Xiaomi")
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, weatherTypes)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerWeatherType.adapter = adapter
     }
 
     private fun setupRecyclerView() {
-        adapter = WeatherAdapter(weatherList, { weather ->
+        adapter = PhoneMarketAdapter(weatherList, { weather ->
             selectedWeather = weather
             edtAreaCode.setText(weather.areaCode)
             edtHumidity.setText(weather.humidity)
@@ -93,9 +87,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun getWeatherTypePosition(weatherType: String): Int {
         return when (weatherType) {
-            "Nắng" -> 1
-            "Mây" -> 2
-            "Mưa" -> 3
+            "Apple" -> 1
+            "Samsung" -> 2
+            "Xiaomi" -> 3
             else -> 0
         }
     }
@@ -106,8 +100,8 @@ class MainActivity : AppCompatActivity() {
         val humidity = edtHumidity.text.toString().trim()
         val weatherType = spinnerWeatherType.selectedItem.toString()
 
-        if (weatherType == "-- Chọn kiểu thời tiết --") {
-            Toast.makeText(this, "Vui lòng chọn kiểu thời tiết", Toast.LENGTH_SHORT).show()
+        if (weatherType == "-- Chọn công ty --") {
+            Toast.makeText(this, "Vui lòng Chọn công ty", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -116,7 +110,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        val weather = Weather(nextId++, areaCode, temperature, humidity, weatherType)
+        val weather = PhoneMarketItem(nextId++, areaCode, temperature, humidity, weatherType)
         weatherList.add(weather)
         adapter.updateList(weatherList)
         clearFields()
@@ -124,28 +118,38 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, "Thêm thành công", Toast.LENGTH_SHORT).show()
     }
 
-    private fun deleteSelectedWeather() {
-        val selected = selectedWeather
-        if (selected == null) {
-            Toast.makeText(this, "Vui lòng chọn một mục để xóa", Toast.LENGTH_SHORT).show()
+    private fun editWeather() {
+        if (selectedWeather == null) {
+            Toast.makeText(this, "Vui lòng chọn một mục để sửa", Toast.LENGTH_SHORT).show()
             return
         }
 
-        AlertDialog.Builder(this)
-            .setTitle("Xác nhận xóa")
-            .setMessage("Bạn có chắc muốn xóa mục này?")
-            .setPositiveButton("Xóa") { _, _ ->
-                weatherList.removeAll { it.id == selected.id }
-                adapter.updateList(weatherList)
-                clearFields()
-                selectedWeather = null
-                Toast.makeText(this, "Xóa thành công", Toast.LENGTH_SHORT).show()
-            }
-            .setNegativeButton("Hủy", null)
-            .show()
+        val areaCode = edtAreaCode.text.toString().trim()
+        val temperature = edtTemperature.text.toString().trim()
+        val humidity = edtHumidity.text.toString().trim()
+        val weatherType = spinnerWeatherType.selectedItem.toString()
+
+        if (weatherType == "-- Chọn công ty --") {
+            Toast.makeText(this, "Vui lòng Chọn công ty", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (areaCode.isEmpty() || temperature.isEmpty() || humidity.isEmpty()) {
+            Toast.makeText(this, "Vui lòng điền đầy đủ thông tin", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val index = weatherList.indexOfFirst { it.id == selectedWeather?.id }
+        if (index != -1) {
+            weatherList[index] = PhoneMarketItem(selectedWeather!!.id, areaCode, temperature, humidity, weatherType)
+            adapter.updateList(weatherList)
+            clearFields()
+            selectedWeather = null
+            Toast.makeText(this, "Cập nhật thành công", Toast.LENGTH_SHORT).show()
+        }
     }
 
-    private fun deleteWeatherItem(weather: Weather) {
+    private fun deleteWeatherItem(weather: PhoneMarketItem) {
         weatherList.removeAll { it.id == weather.id }
         adapter.updateList(weatherList)
         clearFields()
@@ -165,17 +169,20 @@ class MainActivity : AppCompatActivity() {
     private fun saveWeatherData() {
         val gson = Gson()
         val json = gson.toJson(weatherList)
-        sharedPreferences.edit()
-            .putString("weather_data", json)
-            .apply()
+        val file = File(filesDir, "Phone")
+        file.writeText(json)
         Toast.makeText(this, "Dữ liệu đã được lưu", Toast.LENGTH_SHORT).show()
     }
 
     private fun loadWeatherData() {
-        val json = sharedPreferences.getString("weather_data", null) ?: return
+        val file = File(filesDir, "Phone")
+        if (!file.exists()) {
+            return
+        }
+        val json = file.readText()
         val gson = Gson()
-        val type = object : TypeToken<List<Weather>>() {}.type
-        val loadedList: List<Weather> = gson.fromJson(json, type)
+        val type = object : TypeToken<List<PhoneMarketItem>>() {}.type
+        val loadedList: List<PhoneMarketItem> = gson.fromJson(json, type)
         weatherList = loadedList.toMutableList()
         adapter.updateList(weatherList)
         nextId = (weatherList.maxOfOrNull { it.id } ?: 0) + 1

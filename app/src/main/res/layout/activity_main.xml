@@ -18,7 +18,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Dự báo thời tiết"
+            android:text="Thị trường điện thoại"
             android:textColor="#FFFFFF"
             android:textSize="18sp" />
 
@@ -39,7 +39,7 @@
             android:id="@+id/btn_edit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="XÓA"
+            android:text="SỬA"
             android:textColor="#000000"
             android:textSize="14sp"
             android:textStyle="bold"
@@ -67,12 +67,19 @@
         android:orientation="vertical"
         android:padding="8dp">
 
+        <!-- Company Spinner -->
+    <Spinner
+        android:id="@+id/spinner_weather_type"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginBottom="8dp" />
+
         <!-- Input Fields -->
     <EditText
         android:id="@+id/edt_area_code"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:hint="Mã khu vực"
+        android:hint="Năm"
         android:layout_marginBottom="4dp"
         android:padding="8dp" />
 
@@ -80,7 +87,7 @@
         android:id="@+id/edt_temperature"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:hint="Nhiệt độ cao nhất"
+        android:hint="Xuất xưởng"
         android:layout_marginBottom="4dp"
         android:padding="8dp" />
 
@@ -88,16 +95,9 @@
         android:id="@+id/edt_humidity"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:hint="Nhiệt độ thấp nhất"
+        android:hint="Thị phần "
         android:layout_marginBottom="4dp"
         android:padding="8dp" />
-
-    <!-- Weather Type Spinner -->
-    <Spinner
-        android:id="@+id/spinner_weather_type"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginBottom="8dp" />
 
     <!-- Weather List -->
     <androidx.recyclerview.widget.RecyclerView
